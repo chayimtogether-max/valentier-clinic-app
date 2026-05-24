@@ -62,7 +62,7 @@
         };
 
         function initializeLiff() {
-            liff.init({ liffId: "AKfycby8tQc_HBPqAODr-tA7bO3fVlzZTylsWa8CMVmqJepdeuqoKwnKeQeQt_XDucjmabvS" }) 
+            liff.init({ liffId: "2010178370-xHiJkPvz" }) 
                 .then(() => {
                     if (liff.isLoggedIn()) {
                         liff.getProfile().then(profile => {
