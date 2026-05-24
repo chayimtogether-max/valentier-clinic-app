@@ -1,1 +1,0 @@
-# valentier-clinic-app
