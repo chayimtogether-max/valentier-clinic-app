@@ -189,7 +189,7 @@
             let pointsNeeded = targetPoints - points;
             if (pointsNeeded < 0) pointsNeeded = 0;
 
-            document.getElementById("next-tier-info").innerHTML = `อีก <span style="color:#e65100; font-weight:bold;">${pointsNeeded.toLocaleString()}</span> คะแนนเพื่อปลดล็อกระดับ <b>${nextTierName}</b>`;
+            document.getElementById("next-tier-info").innerHTML = `สะสมอีก <span style="color:#e65100; font-weight:bold;">${pointsNeeded.toLocaleString()}</span> คะแนนเพื่อปลดล็อกระดับ <b>${nextTierName}</b>`;
 
             let progressPercent = (points / targetPoints) * 100;
             if (progressPercent < 0) progressPercent = 0;
