@@ -24,6 +24,7 @@
         /* สไตล์กล่องแจ้งเตือนการจ่ายเงินรักษายศปีที่ 3 */
         .maintenance-box { background: #ffebee; border: 1px solid #ef5350; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 14px; color: #c62828; text-align: left; font-weight: bold; }
 
+        /* ปรับปรุงสไตล์หลอดพลังงานให้เห็นสีชัดเจนตัดกับพื้นหลัง */
         .progress-container { margin: 25px auto 15px auto; max-width: 90%; text-align: center; }
         .tier-target-text { font-size: 14px; color: #555; margin-bottom: 10px; font-weight: 500; }
         .progress-bar-bg { background: #eef2f5; border-radius: 10px; height: 14px; width: 100%; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); border: 1px solid #e0e6ed; }
@@ -33,7 +34,7 @@
         button { width: 95%; padding: 12px; background: #d4af37; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
         .hidden { display: none; }
 
-        /* 📜 [ส่วนที่เพิ่มใหม่]: สไตล์ปุ่มและกล่องกติกาสำหรับลูกค้า */
+        /* สไตล์ปุ่มและกล่องกฎกติกา */
         .rules-accordion { max-width: 400px; margin: 15px auto; text-align: left; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .rules-btn { width: 100%; padding: 12px 15px; background: #f9f9f9; color: #555; border: none; text-align: left; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; outline: none; }
         .rules-btn:hover { background: #f1f1f1; }
@@ -144,6 +145,7 @@
                         document.getElementById("userTier").className = `tier ${data.tier}`;
                         document.getElementById("userDiscount").innerText = data.discount; 
                         
+                        // เรียกฟังก์ชันคำนวณเวอร์ชันอัปเดตใหม่เรียงลำดับขั้น
                         updateProgressBar(data.points, data.tier);
 
                         if (data.isExpired) {
@@ -159,17 +161,30 @@
                 });
         }
 
+        // 🧠 ปรับปรุง Logic คำนวณช่วงคะแนนและจุดเป้าหมายปลายทางของยศถัดไปใหม่ทั้งหมด
         function updateProgressBar(points, currentTier) {
             let nextTierName = "";
             let targetPoints = 0;
             let currentTierBase = 0;
             const tierStr = String(currentTier).toLowerCase();
             
-            if (tierStr === "member") { nextTierName = "Silver"; currentTierBase = 0; targetPoints = 5000; } 
-            else if (tierStr === "silver") { nextTierName = "Gold"; currentTierBase = 5000; targetPoints = 20000; } 
-            else if (tierStr === "gold") { nextTierName = "Diamond"; currentTierBase = 20000; targetPoints = 50000; } 
-            else if (tierStr === "diamond") { nextTierName = "Platinum"; currentTierBase = 50000; targetPoints = 100000; } 
-            else {
+            if (tierStr === "member") { 
+                nextTierName = "Silver"; 
+                currentTierBase = 0; 
+                targetPoints = 5000; 
+            } else if (tierStr === "silver") { 
+                nextTierName = "Gold"; 
+                currentTierBase = 0; // ปรับฐานเป็น 0 เพื่อเริ่มไต่จากจุดเริ่มต้นจนถึงเป้าหมาย Gold จริงๆ
+                targetPoints = 50000; // เป้าหมายปลดล็อก Gold คือ 50,000 คะแนน
+            } else if (tierStr === "gold") { 
+                nextTierName = "Diamond"; 
+                currentTierBase = 0; 
+                targetPoints = 100000; 
+            } else if (tierStr === "diamond") { 
+                nextTierName = "Platinum"; 
+                currentTierBase = 0; 
+                targetPoints = 200000; 
+            } else {
                 document.getElementById("next-tier-info").innerHTML = "✨ คุณเป็นสมาชิกระดับสูงสุดเรียบร้อยแล้ว ✨";
                 document.getElementById("progress-fill").style.width = "100%";
                 document.getElementById("current-progress-text").innerText = points.toLocaleString();
@@ -177,12 +192,15 @@
                 return;
             }
 
+            // คำนวณแต้มที่ยังคงขาดจริงเพื่อให้สอดคล้องกับ Logic ของร้าน
             let pointsNeeded = targetPoints - points;
             if (pointsNeeded < 0) pointsNeeded = 0;
 
+            // แสดงข้อความแจ้งแต้มที่ยังขาดอยู่
             document.getElementById("next-tier-info").innerHTML = `อีก <span style="color:#e65100; font-weight:bold;">${pointsNeeded.toLocaleString()}</span> คะแนนเพื่อปลดล็อกยศ <b>${nextTierName}</b>`;
 
-            let progressPercent = ((points - currentTierBase) / (targetPoints - currentTierBase)) * 100;
+            // คำนวณสัดส่วน % แถบพลังงานให้ขยับตามจริง (กรณี 30,000 จาก 50,000 จะได้เท่ากับหลอดวิ่ง 60% สวยๆ ไม่เต็มหลอด)
+            let progressPercent = (points / targetPoints) * 100;
             if (progressPercent < 0) progressPercent = 0;
             if (progressPercent > 100) progressPercent = 100;
 
@@ -191,7 +209,6 @@
             document.getElementById("target-progress-text").innerText = targetPoints.toLocaleString();
         }
 
-        /* 📜 [ส่วนที่เพิ่มใหม่]: ฟังก์ชันควบคุมการยืด-หดของกล่องกติกา */
         function toggleRules() {
             const content = document.getElementById("rulesContent");
             const arrow = document.getElementById("arrow-icon");
