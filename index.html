@@ -20,16 +20,27 @@
         
         .points { font-size: 44px; font-weight: bold; color: #222; margin: 15px 0 5px 0; }
         .discount-box { background: #fffde7; border: 1px dashed #fdd835; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 16px; color: #f57f17; font-weight: bold; }
+        
+        /* สไตล์กล่องแจ้งเตือนการจ่ายเงินรักษายศปีที่ 3 */
+        .maintenance-box { background: #ffebee; border: 1px solid #ef5350; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 14px; color: #c62828; text-align: left; font-weight: bold; }
+
+        .progress-container { margin: 25px auto 15px auto; max-width: 90%; text-align: center; }
+        .tier-target-text { font-size: 14px; color: #555; margin-bottom: 10px; font-weight: 500; }
+        .progress-bar-bg { background: #eef2f5; border-radius: 10px; height: 14px; width: 100%; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); border: 1px solid #e0e6ed; }
+        .progress-bar-fill { background: linear-gradient(90deg, #2196F3, #00BCD4); height: 100%; width: 0%; border-radius: 10px; transition: width 0.6s ease-in-out; }
+        .progress-numeric { font-size: 13px; color: #666; margin-top: 8px; font-weight: bold; display: flex; justify-content: space-between; padding: 0 4px; }
         input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
         button { width: 95%; padding: 12px; background: #d4af37; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
         .hidden { display: none; }
 
-        /* --- [ส่วนที่เพิ่มใหม่]: สไตล์ของ Score Bar ความคืบหน้ายศ --- */
-        .progress-container { margin: 20px auto; max-width: 90%; text-align: center; }
-        .tier-target-text { font-size: 13px; color: #666; margin-bottom: 8px; font-weight: bold; }
-        .progress-bar-bg { background: #e0e0e0; border-radius: 10px; height: 12px; width: 100%; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
-        .progress-bar-fill { background: linear-gradient(90deg, #d4af37, #f3e5ab); height: 100%; width: 0%; border-radius: 10px; transition: width 0.6s ease-in-out; }
-        .progress-numeric { font-size: 12px; color: #555; margin-top: 6px; font-weight: bold; }
+        /* 📜 [ส่วนที่เพิ่มใหม่]: สไตล์ปุ่มและกล่องกติกาสำหรับลูกค้า */
+        .rules-accordion { max-width: 400px; margin: 15px auto; text-align: left; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .rules-btn { width: 100%; padding: 12px 15px; background: #f9f9f9; color: #555; border: none; text-align: left; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; outline: none; }
+        .rules-btn:hover { background: #f1f1f1; }
+        .rules-content { padding: 0 15px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #fff; font-size: 13px; color: #666; line-height: 1.6; }
+        .rules-content ol { padding-left: 20px; margin: 10px 0; }
+        .rules-content li { margin-bottom: 8px; }
+        .rules-content ul { padding-left: 15px; margin: 5px 0; color: #444; }
     </style>
 </head>
 <body>
@@ -55,24 +66,48 @@
         <p style="color: #666; margin: 0 0 15px 0; font-size: 14px;">คะแนนสะสมทั้งหมด</p>
         
         <div class="progress-container">
-            <div class="tier-target-text" id="next-tier-info">
-                อีก <span id="points-needed">0</span> คะแนนเพื่อปลดล็อกยศถัดไป
-            </div>
+            <div class="tier-target-text" id="next-tier-info">กำลังคำนวณคะแนน...</div>
             <div class="progress-bar-bg">
                 <div id="progress-fill" class="progress-bar-fill"></div>
             </div>
             <div class="progress-numeric">
-                <span id="current-progress-text">0</span> / <span id="target-progress-text">0</span>
+                <span style="color: #2196F3;">สะสมแล้ว: <span id="current-progress-text">0</span></span>
+                <span style="color: #777;">เป้าหมาย: <span id="target-progress-text">0</span></span>
             </div>
+        </div>
+
+        <div id="maintenanceNotice" class="maintenance-box hidden">
+            ⚠️ ยศปัจจุบันของคุณสิ้นสุดระยะเวลาใช้งานแล้ว!<br>
+            หากต้องการรักษาระดับสิทธิประโยชน์เดิม กรุณาติดต่อเจ้าหน้าที่หน้าร้านเพื่อชำระค่าธรรมเนียมรักษายศประจำปีครับ
         </div>
 
         <div class="discount-box">
             🎁 คุณได้รับส่วนลดพิเศษ: <span id="userDiscount">0</span>%
         </div>
+
+        <div class="rules-accordion">
+            <button class="rules-btn" onclick="toggleRules()">
+                🔍 อ่านกติกาและเงื่อนไขการรักษายศสมาชิก <span id="arrow-icon">▼</span>
+            </button>
+            <div id="rulesContent" class="rules-content">
+                <ol>
+                    <li><b>เงื่อนไขการสะสมและปรับระดับยศ:</b> ลูกค้าต้องสะสมคะแนนจากยอดใช้บริการให้ถึงเกณฑ์เป้าหมายของแต่ละระดับยศภายในระยะเวลา 1 ปี เพื่อทำการอัปเกรดยศถัดไป</li>
+                    <li><b>การรีเซ็ตคะแนนสะสมประจำปี (ปีที่ 2):</b> เมื่อครบกำหนดระยะเวลา 1 ปี คะแนนสะสมทั้งหมดจะถูกรีเซ็ตลบเหลือ <b>0 คะแนน</b> อัตโนมัติในวันที่ 31 ธันวาคมของปีถัดไป โดยที่ <b>ระดับยศสมาชิกของท่านจะยังคงถูกล็อกไว้อยู่เช่นเดิม</b> เพื่อให้ท่านได้สะสมคะแนนรอบใหม่</li>
+                    <li><b>เงื่อนไขการหมดอายุและการรักษายศ (ปีที่ 3):</b> หากเข้าสู่ปีที่ 3 แล้ว ระดับยศของท่านจะถูกปรับลดลงเป็นระดับเริ่มต้น (Member) เว้นแต่จะทำการชำระค่าธรรมเนียมรักษาสิทธิประโยชน์ประจำปีตามเกณฑ์ดังนี้:
+                        <ul>
+                            <li>🔹 รักษายศ <b>Silver</b> : ชำระ 10,000 บาท / ปี</li>
+                            <li>🔸 รักษายศ <b>Gold</b> : ชำระ 25,000 บาท / ปี</li>
+                            <li>🔷 รักษายศ <b>Diamond</b> : ชำระ 50,000 บาท / ปี</li>
+                            <li>👑 รักษายศ <b>Platinum</b> : ชำระ 100,000 บาท / ปี</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p style="font-size:11px; color:#aaa; margin-top:5px; text-align:right;">*เงื่อนไขเป็นไปตามที่คลินิกกำหนด</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        // ลิงก์และสิทธิ์ทุกอย่างถูกเก็บไว้คงเดิมทั้งหมด
         const BACKEND_URL = "https://script.google.com/macros/s/AKfycby8tQc_HBPqAODr-tA7bO3fVlzZTylsWa8CMVmqJepdeuqoKwnKeQeQt_XDucjmabvS/exec"; 
         let userId = "test_line_id_123"; 
 
@@ -93,7 +128,6 @@
                     }
                 })
                 .catch((err) => {
-                    console.log("เปิดในโหมดทดสอบ (Local Test)");
                     checkMemberStatus(); 
                 });
         }
@@ -110,8 +144,13 @@
                         document.getElementById("userTier").className = `tier ${data.tier}`;
                         document.getElementById("userDiscount").innerText = data.discount; 
                         
-                        // --- [ส่วนที่เพิ่มใหม่]: สั่งให้คำนวณและดึงหลอดคะแนนให้ทำงาน ---
                         updateProgressBar(data.points, data.tier);
+
+                        if (data.isExpired) {
+                            document.getElementById("maintenanceNotice").classList.remove("hidden");
+                        } else {
+                            document.getElementById("maintenanceNotice").classList.add("hidden");
+                        }
 
                         document.getElementById("dashboard").classList.remove("hidden");
                     } else {
@@ -120,34 +159,17 @@
                 });
         }
 
-        // --- [ส่วนที่เพิ่มใหม่]: ฟังก์ชันคำนวณหลอดคะแนนสไตล์แอปใหญ่ ---
         function updateProgressBar(points, currentTier) {
             let nextTierName = "";
             let targetPoints = 0;
             let currentTierBase = 0;
-            
-            // อ้างอิงตามลำดับระดับยศของคุณ: Member -> Silver -> Gold -> Diamond -> Platinum
-            // (ปรับเปลี่ยนช่วงเกณฑ์ตัวเลขคะแนนตรงนี้ได้ตามสิทธิ์ของร้านคุณเลยนะครับ)
             const tierStr = String(currentTier).toLowerCase();
             
-            if (tierStr === "member") {
-                nextTierName = "Silver";
-                targetPoints = 5000;  // ตั้งเป้าไปซิลเวอร์ที่ 5,000 คะแนน
-                currentTierBase = 0;
-            } else if (tierStr === "silver") {
-                nextTierName = "Gold";
-                targetPoints = 20000; // ตั้งเป้าไปโกลด์ที่ 20,000 คะแนน
-                currentTierBase = 0;
-            } else if (tierStr === "gold") {
-                nextTierName = "Diamond";
-                targetPoints = 50000; // ตั้งเป้าไปไดมอนด์ที่ 50,000 คะแนน
-                currentTierBase = 0;
-            } else if (tierStr === "diamond") {
-                nextTierName = "Platinum";
-                targetPoints = 100000; // ตั้งเป้าไปพลาตินัมที่ 100,000 คะแนน
-                currentTierBase = 0;
-            } else {
-                // ถ้าสมาชิกระดับสูงสุดแล้ว (Platinum)
+            if (tierStr === "member") { nextTierName = "Silver"; currentTierBase = 0; targetPoints = 5000; } 
+            else if (tierStr === "silver") { nextTierName = "Gold"; currentTierBase = 5000; targetPoints = 20000; } 
+            else if (tierStr === "gold") { nextTierName = "Diamond"; currentTierBase = 20000; targetPoints = 50000; } 
+            else if (tierStr === "diamond") { nextTierName = "Platinum"; currentTierBase = 50000; targetPoints = 100000; } 
+            else {
                 document.getElementById("next-tier-info").innerHTML = "✨ คุณเป็นสมาชิกระดับสูงสุดเรียบร้อยแล้ว ✨";
                 document.getElementById("progress-fill").style.width = "100%";
                 document.getElementById("current-progress-text").innerText = points.toLocaleString();
@@ -158,18 +180,28 @@
             let pointsNeeded = targetPoints - points;
             if (pointsNeeded < 0) pointsNeeded = 0;
 
-            // แสดงข้อความบอกแต้มที่ขาด
-            document.getElementById("next-tier-info").innerHTML = `อีก <span style="color:#d4af37; font-size:15px;">${pointsNeeded.toLocaleString()}</span> คะแนนเพื่อปลดล็อกยศ <b>${nextTierName}</b>`;
+            document.getElementById("next-tier-info").innerHTML = `อีก <span style="color:#e65100; font-weight:bold;">${pointsNeeded.toLocaleString()}</span> คะแนนเพื่อปลดล็อกยศ <b>${nextTierName}</b>`;
 
-            // คำนวณเปอร์เซ็นต์ความคืบหน้าเพื่อดันหลอดให้วิ่งตามแต้มจริง
-            let progressPercent = (points / targetPoints) * 100;
+            let progressPercent = ((points - currentTierBase) / (targetPoints - currentTierBase)) * 100;
             if (progressPercent < 0) progressPercent = 0;
             if (progressPercent > 100) progressPercent = 100;
 
-            // ดันหลอดสีทองและโชว์ตัวเลขสรุป
             document.getElementById("progress-fill").style.width = progressPercent + "%";
             document.getElementById("current-progress-text").innerText = points.toLocaleString();
             document.getElementById("target-progress-text").innerText = targetPoints.toLocaleString();
+        }
+
+        /* 📜 [ส่วนที่เพิ่มใหม่]: ฟังก์ชันควบคุมการยืด-หดของกล่องกติกา */
+        function toggleRules() {
+            const content = document.getElementById("rulesContent");
+            const arrow = document.getElementById("arrow-icon");
+            if (content.style.maxHeight && content.style.maxHeight !== "0px") {
+                content.style.maxHeight = "0px";
+                arrow.innerText = "▼";
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+                arrow.innerText = "▲";
+            }
         }
 
         function registerUser() {
@@ -185,11 +217,7 @@
                 body: JSON.stringify({ action: "register", lineId: userId, name: name, phone: phone })
             })
             .then(res => res.json())
-            .then(data => {
-                if(data.status === "success") {
-                    checkMemberStatus();
-                }
-            });
+            .then(data => { if(data.status === "success") { checkMemberStatus(); } });
         }
     </script>
 </body>
