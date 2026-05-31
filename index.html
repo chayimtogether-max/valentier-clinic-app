@@ -10,11 +10,11 @@
         .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; max-width: 400px; margin: 20px auto; }
         
         .tier { font-weight: bold; font-size: 24px; padding: 6px 20px; border-radius: 20px; display: inline-block; margin-top: 10px; text-transform: uppercase; }
-        .Member { background: #f5f5f5; color: #9e9e9e; }
-        .Silver { background: #e0e0e0; color: #616161; border: 1px solid #bdbdbd; }
-        .Gold { background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
-        .Diamond { background: #e1f5fe; color: #01579b; border: 1px solid #b3e5fc; }
-        .Platinum { background: #eceff1; color: #37474f; border: 1px solid #cfd8dc; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .Member, .member { background: #f5f5f5; color: #9e9e9e; }
+        .Silver, .silver { background: #e0e0e0; color: #616161; border: 1px solid #bdbdbd; }
+        .Gold, .gold { background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
+        .Diamond, .diamond { background: #e1f5fe; color: #01579b; border: 1px solid #b3e5fc; }
+        .Platinum, .platinum { background: #eceff1; color: #37474f; border: 1px solid #cfd8dc; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         
         .points { font-size: 44px; font-weight: bold; color: #222; margin: 15px 0 5px 0; }
         .discount-box { background: #fffde7; border: 1px dashed #fdd835; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 16px; color: #f57f17; font-weight: bold; }
@@ -128,7 +128,8 @@
         }
 
         function checkMemberStatus() {
-            fetch(`${BACKEND_URL}?action=getProfile&lineId=${userId}`)
+            // ป้องกัน Cache โดยการห้อยท้ายเวลาสุ่มเพื่อบังคับให้ดึงค่าใหม่สดๆ ทุกครั้ง
+            fetch(`${BACKEND_URL}?action=getProfile&lineId=${userId}&_t=${new Date().getTime()}`)
                 .then(res => res.json())
                 .then(data => {
                     document.getElementById("loading").classList.add("hidden");
@@ -154,18 +155,18 @@
                 });
         }
 
-        // สูตรคำนวณหลอดพลังงานตามระบบเกณฑ์คะแนนสะสมสุทธิ
         function updateProgressBar(points, currentTier) {
             let nextTierName = "";
             let targetPoints = 0;
-            const tierStr = String(currentTier).toLowerCase();
+            const tierStr = String(currentTier).toLowerCase().trim();
             
-            if (tierStr === "member") { 
+            // ตัดปัญหาเรื่องตัวอักษรเล็กใหญ่ ตรวจสอบเงื่อนไขอย่างรอบคอบ
+            if (tierStr === "member" || tierStr === "") { 
                 nextTierName = "Silver"; 
                 targetPoints = 5000; 
             } else if (tierStr === "silver") { 
                 nextTierName = "Gold"; 
-                targetPoints = 50000; // เป้าหมายสะสมรวมทั้งหมดเพื่อขึ้นยศ Gold คือ 50,000
+                targetPoints = 50000; 
             } else if (tierStr === "gold") { 
                 nextTierName = "Diamond"; 
                 targetPoints = 100000; 
@@ -180,13 +181,11 @@
                 return;
             }
 
-            // คำนวณหาคะแนนที่ขาดอยู่จากเป้าหมายใหญ่ตรงๆ
             let pointsNeeded = targetPoints - points;
             if (pointsNeeded < 0) pointsNeeded = 0;
 
             document.getElementById("next-tier-info").innerHTML = `อีก <span style="color:#e65100; font-weight:bold;">${pointsNeeded.toLocaleString()}</span> คะแนนเพื่อปลดล็อกยศ <b>${nextTierName}</b>`;
 
-            // ขยับเปอร์เซ็นต์หลอดตามคะแนนสะสมจริงเทียบกับเป้าหมายใหญ่ (30,000 / 50,000 = 60%)
             let progressPercent = (points / targetPoints) * 100;
             if (progressPercent < 0) progressPercent = 0;
             if (progressPercent > 100) progressPercent = 100;
