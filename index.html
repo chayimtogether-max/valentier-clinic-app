@@ -58,18 +58,17 @@
             overflow: hidden; /* ป้องกันไอคอนล้นขอบการ์ด */
         }
 
-        /* 💎 สไตล์ไอคอนยศประจำการ์ดลอยฝั่งขวา (โปร่งแสงหรูหราตามแบบ image_23) */
-        .card-tier-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 85px; /* ขนาดใหญ่เด่นสวยงาม */
-            opacity: 0.18;  /* จางลงบาง ๆ ให้ดูพรีเมียมไม่ทับตัวหนังสือ */
-            pointer-events: none;
-            user-select: none;
-            transition: all 0.5s ease;
-        }
+        /* 💎 ขยับไอคอนยศขึ้นไปอยู่มุมขวาบนตามวงกลมใน image_24.png */
+.card-tier-icon {
+    position: absolute;
+    right: 20px;       /* ระยะห่างจากขอบขวา */
+    top: 20px;         /* ปรับขยับขึ้นไปด้านบน (แทนที่ top: 50% เดิม) */
+    font-size: 65px;   /* ขนาดปรับให้เล็กลงนิดนึงเพื่อให้เข้ามุมได้สวยงาม ไม่เบียดข้อความ */
+    opacity: 0.3;      /* ความโปร่งแสงจางๆ กำลังหรู */
+    color: #f3e5ab;
+    pointer-events: none;
+    transition: all 0.5s ease;
+}
 
         /* การ์ดฟอร์มสมัครและหน้าโหลดให้จัดกลางเด่นๆ */
         #loading, #registerForm {
