@@ -55,6 +55,20 @@
             margin: 0 auto 20px auto; 
             position: relative;
             box-sizing: border-box;
+            overflow: hidden; /* ป้องกันไอคอนล้นขอบการ์ด */
+        }
+
+        /* 💎 สไตล์ไอคอนยศประจำการ์ดลอยฝั่งขวา (โปร่งแสงหรูหราตามแบบ image_23) */
+        .card-tier-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 85px; /* ขนาดใหญ่เด่นสวยงาม */
+            opacity: 0.18;  /* จางลงบาง ๆ ให้ดูพรีเมียมไม่ทับตัวหนังสือ */
+            pointer-events: none;
+            user-select: none;
+            transition: all 0.5s ease;
         }
 
         /* การ์ดฟอร์มสมัครและหน้าโหลดให้จัดกลางเด่นๆ */
@@ -107,6 +121,8 @@
             font-size: 13px;
             text-transform: uppercase;
             margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
         }
 
         /* 🔢 ตัวเลขคะแนนสะสมขนาดใหญ่ */
@@ -115,17 +131,23 @@
             font-weight: 300; /* ใช้ฟอนต์บางลงเพื่อให้ดูแพง */
             color: #ffffff;
             margin: 10px 0 5px 0;
+            position: relative;
+            z-index: 2;
         }
         .points-label {
             color: #a89a8a;
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            position: relative;
+            z-index: 2;
         }
 
         /* 📊 หลอดคะแนนก้าวหน้า (Progress Bar ครีมทอง) */
         .progress-container {
             margin: 20px 0 5px 0;
+            position: relative;
+            z-index: 2;
         }
         .next-tier-text {
             color: #bcaf9f;
@@ -273,6 +295,8 @@
         <div class="user-name" id="userName">-</div>
 
         <div class="card">
+            <div class="card-tier-icon" id="cardTierIcon">🏷️</div>
+
             <div id="userTier" class="tier-badge">Member</div>
             
             <div class="points-display" id="userPoints">0</div>
@@ -369,6 +393,9 @@
                         document.getElementById("userTier").innerText = data.tier;
                         document.getElementById("userDiscount").innerText = data.discount; 
                         
+                        // 🔄 อัปเดตไอคอนยศบนการ์ดอัตโนมัติ
+                        updateTierIcon(data.tier);
+                        
                         updateProgressBar(data.points, data.tier);
 
                         if (data.isExpired) {
@@ -382,6 +409,20 @@
                         document.getElementById("registerForm").classList.remove("hidden");
                     }
                 });
+        }
+
+        // 🌟 ฟังก์ชันสลับไอคอนลอยตามระดับขั้นอัตโนมัติ
+        function updateTierIcon(currentTier) {
+            const tierIconMap = {
+                "member": "🏷️",
+                "silver": "🥈",
+                "gold": "✨",
+                "diamond": "💎",
+                "platinum": "👑"
+            };
+            const tierKey = String(currentTier).toLowerCase().trim();
+            // ถ้าดึงยศมาแล้วไม่ตรงในกล่อง ให้โยนไอคอน Member สแตนด์บายไว้แทนครับ
+            document.getElementById("cardTierIcon").innerText = tierIconMap[tierKey] || "🏷️";
         }
 
         function updateProgressBar(points, currentTier) {
